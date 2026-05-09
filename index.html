@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Can You Afford Greater Boston?</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="hero">
+    <h1>Can You Afford Greater Boston?</h1>
+    <p>
+        Housing in Greater Boston has become harder to afford as rent prices continue
+        to rise in Boston and nearby cities. This data story compares Boston, Quincy,
+        Revere, and Medford to show how rent, income, and rent burden have changed
+        over time.
+      </p>
+  </header>
+
+  <main>
+    <section class="story-section">
+      <h2>Rent Has Been Rising Across Greater Boston</h2>
+      <p>
+        This chart shows how median monthly rent has changed over time in each city.
+        Comparing the lines helps show whether rent is rising at a similar pace across
+        Greater Boston or if some cities are becoming expensive faster than others.
+      </p>
+      <div id="rent-line-chart" class="chart"></div>
+      <p class="chart-note">
+        The trend shows that rent has increased across all four cities, but the size
+        and speed of the increase can vary by location.
+      </p>
+    </section>
+
+    <section class="story-section">
+        <h2>Rent Compared to Income</h2>
+        <p>
+          Rent alone does not tell the full story. A city can have lower rent than
+          Boston, but if income is also lower, residents may still struggle to afford
+          housing. This chart compares median monthly rent with estimated monthly
+          household income for each city in the latest year.
+        </p>
+        <div id="rent-income-chart" class="chart"></div>
+        <p class="chart-note">
+          This comparison helps show the gap between what households earn each month
+          and how much of that income may go toward rent.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>Which City Is the Most Rent Burdened?</h2>
+        <p>
+          Rent burden shows the percentage of household income that goes toward rent.
+          This is one of the clearest ways to measure affordability because it connects
+          housing cost directly to income.
+        </p>
+        <div id="rent-burden-chart" class="chart"></div>
+        <p class="chart-note">
+          A higher rent burden means residents are spending a larger share of their
+          income on housing, which can make a city less affordable even if the rent
+          looks lower compared to Boston.
+        </p>
+      </section>
+
+      <section class="story-section conclusion">
+        <h2>Conclusion</h2>
+        <p>
+          The data shows that affordability is not only about how high rent is, but
+          also about whether income is keeping up. By comparing rent, income, and rent
+          burden across Boston, Quincy, Revere, and Medford, this project shows how
+          housing pressure affects both the city and nearby communities.
+        </p>
+        <p>
+          As the project continues, the sample data will be replaced with real data
+          from sources such as the U.S. Census Bureau, Analyze Boston, and Massachusetts
+          housing datasets.
+        </p>
+      </section>
+  </main>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
