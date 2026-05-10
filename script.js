@@ -1,3 +1,12 @@
+let tooltip = d3.select("#tooltip");
+
+if (tooltip.empty()) {
+  tooltip = d3.select("body")
+    .append("div")
+    .attr("id", "tooltip")
+    .attr("class", "tooltip");
+}
+
 // Load the CSV data
 d3.csv("data/affordability.csv").then(function(data) {
     // Convert numbers from text into actual numbers
@@ -78,6 +87,32 @@ d3.csv("data/affordability.csv").then(function(data) {
         .attr("stroke-width", 3)
         .attr("d", line);
   
+      
+        svg.selectAll(`.dot-${city}`)
+    .data(cityData)
+    .enter()
+    .append("circle")
+    .attr("cx", d => x(d.year))
+    .attr("cy", d => y(d.median_rent))
+    .attr("r", 5)
+    .attr("fill", color(city))
+    .on("mouseover", function(event, d) {
+      tooltip
+        .style("display", "block")
+        .html(`
+          <strong>${d.city}</strong><br>
+          Year: ${d.year}<br>
+          Median Rent: $${d3.format(",")(d.median_rent)}
+        `);
+    })
+    .on("mousemove", function(event) {
+      tooltip
+        .style("left", event.pageX + 15 + "px")
+        .style("top", event.pageY - 25 + "px");
+    })
+    .on("mouseout", function() {
+      tooltip.style("display", "none");
+    });  
       // Add city label at the end of each line
       const lastPoint = cityData[cityData.length - 1];
   
@@ -133,8 +168,7 @@ d3.csv("data/affordability.csv").then(function(data) {
     svg.append("g")
       .call(d3.axisLeft(y).tickFormat(d => d + "%"));
   
-    // Bars
-    svg.selectAll("rect")
+      svg.selectAll("rect")
       .data(latestData)
       .enter()
       .append("rect")
@@ -142,7 +176,26 @@ d3.csv("data/affordability.csv").then(function(data) {
       .attr("y", d => y(d.rent_burden))
       .attr("width", x.bandwidth())
       .attr("height", d => height - y(d.rent_burden))
-      .attr("fill", "#4f46e5");
+      .attr("fill", "#4f46e5")
+      .on("mouseover", function(event, d) {
+        tooltip
+          .style("display", "block")
+          .html(`
+            <strong>${d.city}</strong><br>
+            Year: ${d.year}<br>
+            Rent Burden: ${d.rent_burden}%<br>
+            Median Rent: $${d3.format(",")(d.median_rent)}<br>
+            Median Income: $${d3.format(",")(d.median_income)}
+          `);
+      })
+      .on("mousemove", function(event) {
+        tooltip
+          .style("left", event.pageX + 15 + "px")
+          .style("top", event.pageY - 25 + "px");
+      })
+      .on("mouseout", function() {
+        tooltip.style("display", "none");
+      });
   
     // Data labels
     svg.selectAll(".label")
@@ -252,7 +305,25 @@ function drawRentIncomeChart(data) {
       .attr("y", d => y(d.value))
       .attr("width", xSubgroup.bandwidth())
       .attr("height", d => height - y(d.value))
-      .attr("fill", d => color(d.key));
+      .attr("fill", d => color(d.key))
+      .on("mouseover", function(event, d) {
+        const label = d.key === "median_rent" ? "Median Monthly Rent" : "Estimated Monthly Income";
+      
+        tooltip
+          .style("display", "block")
+          .html(`
+            <strong>${label}</strong><br>
+            Amount: $${d3.format(",.0f")(d.value)}
+          `);
+      })
+      .on("mousemove", function(event) {
+        tooltip
+          .style("left", event.pageX + 15 + "px")
+          .style("top", event.pageY - 25 + "px");
+      })
+      .on("mouseout", function() {
+        tooltip.style("display", "none");
+      });
   
     // Legend
     const legend = svg.append("g")
