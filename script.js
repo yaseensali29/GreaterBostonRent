@@ -18,6 +18,7 @@ d3.csv("data/affordability.csv").then(function(data) {
     });
   
     drawRentLineChart(data);
+    drawRentGrowthChart(data);
     drawRentIncomeChart(data);
     drawRentBurdenChart(data);
   });
@@ -353,3 +354,110 @@ function drawRentIncomeChart(data) {
       .attr("y", 37)
       .text("Monthly Income");
   }
+
+  // Chart 4: Percent increase in rent by city
+function drawRentGrowthChart(data) {
+  const cities = Array.from(new Set(data.map(d => d.city)));
+
+  const growthData = cities.map(city => {
+    const cityData = data
+      .filter(d => d.city === city)
+      .sort((a, b) => a.year - b.year);
+
+    const first = cityData[0];
+    const last = cityData[cityData.length - 1];
+
+    const percentIncrease = ((last.median_rent - first.median_rent) / first.median_rent) * 100;
+
+    return {
+      city: city,
+      startYear: first.year,
+      endYear: last.year,
+      startRent: first.median_rent,
+      endRent: last.median_rent,
+      percentIncrease: percentIncrease
+    };
+  });
+
+  growthData.sort((a, b) => b.percentIncrease - a.percentIncrease);
+
+  const margin = { top: 50, right: 40, bottom: 70, left: 90 };
+  const width = 850 - margin.left - margin.right;
+  const height = 400 - margin.top - margin.bottom;
+
+  const svg = d3.select("#rent-growth-chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleBand()
+    .domain(growthData.map(d => d.city))
+    .range([0, width])
+    .padding(0.3);
+
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(growthData, d => d.percentIncrease) + 5])
+    .range([height, 0]);
+
+  svg.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x));
+
+  svg.append("g")
+    .call(d3.axisLeft(y).tickFormat(d => d + "%"));
+
+  svg.selectAll("rect")
+    .data(growthData)
+    .enter()
+    .append("rect")
+    .attr("x", d => x(d.city))
+    .attr("y", d => y(d.percentIncrease))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.percentIncrease))
+    .attr("fill", "#059669")
+    .on("mouseover", function(event, d) {
+      tooltip
+        .style("display", "block")
+        .html(`
+          <strong>${d.city}</strong><br>
+          ${d.startYear} Rent: $${d3.format(",")(d.startRent)}<br>
+          ${d.endYear} Rent: $${d3.format(",")(d.endRent)}<br>
+          Increase: ${d.percentIncrease.toFixed(1)}%
+        `);
+    })
+    .on("mousemove", function(event) {
+      tooltip
+        .style("left", event.pageX + 15 + "px")
+        .style("top", event.pageY - 25 + "px");
+    })
+    .on("mouseout", function() {
+      tooltip.style("display", "none");
+    });
+
+  svg.selectAll(".growth-label")
+    .data(growthData)
+    .enter()
+    .append("text")
+    .attr("class", "growth-label")
+    .attr("x", d => x(d.city) + x.bandwidth() / 2)
+    .attr("y", d => y(d.percentIncrease) - 8)
+    .attr("text-anchor", "middle")
+    .text(d => d.percentIncrease.toFixed(1) + "%");
+
+  svg.append("text")
+    .attr("x", -height / 2)
+    .attr("y", -60)
+    .attr("transform", "rotate(-90)")
+    .attr("text-anchor", "middle")
+    .text("Percent Increase in Median Rent");
+
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", -20)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "18px")
+    .attr("font-weight", "bold")
+    .text(`Percent Increase in Rent from ${growthData[0].startYear} to ${growthData[0].endYear}`);
+}
